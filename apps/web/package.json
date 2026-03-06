@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@a11y-lens/a11y-companion": "workspace:*",
+    "@ark-ui/react": "^5.31.0",
     "next": "^15.0.0",
     "prettier": "^3.8.1",
     "react": "^19.0.0",
