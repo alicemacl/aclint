@@ -1,0 +1,11 @@
+{
+  "name": "a11y-lens",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "build": "pnpm --filter web build"
+  },
+  "devDependencies": {
+    "prettier": "^3.8.1"
+  }
+}
