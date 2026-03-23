@@ -3,10 +3,18 @@
  */
 
 export { A11yOverlay } from './a11y-overlay';
+export type { A11yOverlayProps } from './a11y-overlay';
 export { A11yPanel } from './a11y-panel';
 export { A11yHighlight } from './a11y-highlight';
 export { useFocusTracking } from './use-focus-tracking';
 export type { FocusedElementInfo, FocusTrackingResult } from './use-focus-tracking';
+export type { ParentContext, PositionInSet } from './focus-types';
+export type { VOAnnouncement, VOAnnouncementPart } from './vo-engine';
+export { generateVOAnnouncement } from './vo-engine';
+export { VO_ROLE_MAP, getVORoleEntry } from './vo-role-map';
+export type { PatternViolation } from './pattern-detector';
+export { detectPatternIssues, patternViolationsToMappedIssues } from './pattern-detector';
+export { ALL_PATTERNS } from './component-patterns';
 
 // Fix guidance (legacy)
 export { FIX_GUIDANCE, getFixGuidance, hasFixGuidance } from './fix-guidance';

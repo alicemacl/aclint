@@ -5,6 +5,7 @@
  * Shows what users experience, with progressive disclosure of fix guidance.
  */
 
+import type { RefObject } from 'react';
 import { useCallback, useEffect, useState } from 'react';
 
 import { FloatingPanel } from '@ark-ui/react/floating-panel';
@@ -54,6 +55,8 @@ type A11yPanelProps = {
   focusInfo: FocusTrackingResult;
   showHighlight: boolean;
   onToggleHighlight: () => void;
+  /** When set, portals render here (e.g. Shadow root) so styles stay scoped. */
+  portalContainerRef?: RefObject<HTMLElement | null>;
 };
 
 export function A11yPanel({
@@ -62,6 +65,7 @@ export function A11yPanel({
   focusInfo,
   showHighlight,
   onToggleHighlight,
+  portalContainerRef,
 }: A11yPanelProps) {
   const { current, prev, next, totalFocusable, currentIndex, issues, isChecking } = focusInfo;
   const [stage, setStage] = useState<Stage>('default');
@@ -84,8 +88,10 @@ export function A11yPanel({
   // Count active simulations
   const activeSimCount = Object.values(simulations).filter(Boolean).length;
 
-  // Sort issues by severity
-  const sortedIssues = sortBySeverity(issues);
+  const patternIssues = issues.filter((i) => i.source === 'pattern');
+  const wcagIssues = issues.filter((i) => i.source !== 'pattern');
+  const sortedPatternIssues = sortBySeverity(patternIssues);
+  const sortedWcagIssues = sortBySeverity(wcagIssues);
 
   const openFixView = (issue: MappedIssue) => {
     setSelectedIssue(issue);
@@ -141,7 +147,7 @@ export function A11yPanel({
       persistRect
       closeOnEscape={false}
     >
-      <Portal>
+      <Portal container={portalContainerRef}>
         <FloatingPanel.Positioner className={positionerStyles}>
           <FloatingPanel.Content
             className={contentStyles}
@@ -202,7 +208,7 @@ export function A11yPanel({
                       )}
                     </button>
                   </Menu.Trigger>
-                  <Portal>
+                  <Portal container={portalContainerRef}>
                     <Menu.Positioner className={simMenuPositionerStyles}>
                       <Menu.Content
                         className={simMenuStyles}
@@ -289,7 +295,8 @@ export function A11yPanel({
                     current={current}
                     prev={prev}
                     next={next}
-                    issues={sortedIssues}
+                    patternIssues={sortedPatternIssues}
+                    wcagIssues={sortedWcagIssues}
                     isChecking={isChecking}
                     showSnippet={showSnippet}
                     onToggleSnippet={() => setShowSnippet((p) => !p)}
@@ -332,7 +339,8 @@ type MainViewProps = {
   current: FocusedElementInfo | null;
   prev: FocusedElementInfo | null;
   next: FocusedElementInfo | null;
-  issues: MappedIssue[];
+  patternIssues: MappedIssue[];
+  wcagIssues: MappedIssue[];
   isChecking: boolean;
   showSnippet: boolean;
   onToggleSnippet: () => void;
@@ -347,7 +355,8 @@ function MainView({
   current,
   prev,
   next,
-  issues,
+  patternIssues,
+  wcagIssues,
   isChecking,
   showSnippet,
   onToggleSnippet,
@@ -357,6 +366,8 @@ function MainView({
   onFocusPrev,
   onFocusNext,
 }: MainViewProps) {
+  const [showVoBreakdown, setShowVoBreakdown] = useState(false);
+
   if (!current) {
     return (
       <div className={emptyStateStyles}>
@@ -366,12 +377,14 @@ function MainView({
     );
   }
 
+  const totalIssueCount = patternIssues.length + wcagIssues.length;
+
   return (
     <div className={mainViewStyles}>
-      {/* Screen reader announcement - PRIMARY FOCUS */}
+      {/* VoiceOver (macOS) — assistant, not a replacement for real VO testing */}
       <div className={announcementBoxStyles}>
         <div className={announcementHeaderStyles}>
-          <span className={announcementTitleStyles}>Screen reader says</span>
+          <span className={announcementTitleStyles}>VoiceOver (macOS) says</span>
           <button
             className={iconButtonStyles}
             onClick={onCopyAnnouncement}
@@ -383,6 +396,30 @@ function MainView({
           </button>
         </div>
         <p className={announcementTextStyles}>&ldquo;{current.announcement}&rdquo;</p>
+        <p className={voHintStyles}>
+          Approximation for learning — verify with VoiceOver (VO) on a real device.
+        </p>
+        <div
+          className={snippetToggleStyles}
+          onClick={() => setShowVoBreakdown((v) => !v)}
+          onMouseDown={(e) => e.preventDefault()}
+        >
+          <ChevronDown
+            size={12}
+            className={cx(snippetChevronStyles, showVoBreakdown && snippetChevronOpenStyles)}
+          />
+          <span>How this line is built</span>
+        </div>
+        {showVoBreakdown && (
+          <ul className={voBreakdownListStyles}>
+            {current.voOutput.parts.map((part, i) => (
+              <li key={i} className={voBreakdownItemStyles}>
+                <span className={voBreakdownLabelStyles}>{part.label}</span>
+                <span className={voBreakdownTextStyles}>{part.text}</span>
+              </li>
+            ))}
+          </ul>
+        )}
         {/* Ownership warning */}
         {current.ownershipIssue && (
           <div className={ownershipWarningStyles}>
@@ -505,15 +542,32 @@ function MainView({
         </div>
       )}
 
-      {!isChecking && issues.length > 0 && (
-        <div className={issuesSectionStyles}>
-          {issues.map((issue) => (
-            <IssueCard key={issue.id} issue={issue} onOpenFix={onOpenFix} />
-          ))}
+      {!isChecking && patternIssues.length > 0 && (
+        <div className={patternSectionStyles}>
+          <div className={subsectionTitleStyles}>Semantic patterns</div>
+          <p className={subsectionHintStyles}>
+            Context Lighthouse-style tools often miss — role vs. real behavior.
+          </p>
+          <div className={issuesSectionStyles}>
+            {patternIssues.map((issue) => (
+              <IssueCard key={issue.id} issue={issue} onOpenFix={onOpenFix} />
+            ))}
+          </div>
         </div>
       )}
 
-      {!isChecking && issues.length === 0 && (
+      {!isChecking && wcagIssues.length > 0 && (
+        <div className={patternSectionStyles}>
+          <div className={subsectionTitleStyles}>WCAG (axe / AccessLint)</div>
+          <div className={issuesSectionStyles}>
+            {wcagIssues.map((issue) => (
+              <IssueCard key={issue.id} issue={issue} onOpenFix={onOpenFix} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {!isChecking && totalIssueCount === 0 && (
         <div className={noIssuesStyles}>
           <span>No issues found</span>
         </div>
@@ -543,6 +597,17 @@ function IssueCard({ issue, onOpenFix }: IssueCardProps) {
       <div className={issueCardHeaderStyles}>
         <AlertTriangle size={14} />
         <span className={issueCardTitleStyles}>{issue.title}</span>
+        {issue.source && (
+          <span
+            className={cx(
+              sourceBadgeStyles,
+              issue.source === 'accesslint' && sourceBadgeAccessLintStyles,
+              issue.source === 'pattern' && sourceBadgePatternStyles,
+            )}
+          >
+            {issue.source === 'accesslint' ? 'AL' : issue.source === 'pattern' ? 'sem' : 'axe'}
+          </span>
+        )}
       </div>
       <div className={issueCardFooterStyles}>
         {issue.guidance ? (
@@ -1121,6 +1186,59 @@ const announcementTextStyles = css({
   fontStyle: 'italic',
 });
 
+const voHintStyles = css({
+  fontSize: '10px',
+  color: 'blue.400/80',
+  marginTop: '6px',
+  lineHeight: '1.3',
+});
+
+const voBreakdownListStyles = css({
+  margin: '8px 0 0 0',
+  paddingLeft: '16px',
+  fontSize: '11px',
+  color: 'gray.300',
+  lineHeight: '1.45',
+});
+
+const voBreakdownItemStyles = css({
+  marginBottom: '4px',
+});
+
+const voBreakdownLabelStyles = css({
+  display: 'block',
+  fontSize: '9px',
+  fontWeight: 'semibold',
+  color: 'gray.500',
+  textTransform: 'uppercase',
+  letterSpacing: '0.04em',
+});
+
+const voBreakdownTextStyles = css({
+  color: 'gray.200',
+});
+
+const patternSectionStyles = css({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '6px',
+});
+
+const subsectionTitleStyles = css({
+  fontSize: '11px',
+  fontWeight: 'semibold',
+  color: 'gray.400',
+  textTransform: 'uppercase',
+  letterSpacing: '0.05em',
+});
+
+const subsectionHintStyles = css({
+  fontSize: '10px',
+  color: 'gray.500',
+  lineHeight: '1.3',
+  marginTop: '-2px',
+});
+
 const ownershipWarningStyles = css({
   display: 'flex',
   alignItems: 'flex-start',
@@ -1380,6 +1498,28 @@ const issueCardTitleStyles = css({
   fontWeight: 'medium',
   color: 'white',
   lineHeight: '1.3',
+});
+
+const sourceBadgeStyles = css({
+  fontSize: '9px',
+  fontWeight: 'bold',
+  padding: '1px 4px',
+  borderRadius: 'sm',
+  backgroundColor: 'gray.700',
+  color: 'gray.400',
+  flexShrink: 0,
+  textTransform: 'uppercase',
+  letterSpacing: '0.04em',
+});
+
+const sourceBadgeAccessLintStyles = css({
+  backgroundColor: 'purple.900/60',
+  color: 'purple.300',
+});
+
+const sourceBadgePatternStyles = css({
+  backgroundColor: 'teal.900/60',
+  color: 'teal.300',
 });
 
 const issueCardFooterStyles = css({

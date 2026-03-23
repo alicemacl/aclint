@@ -9,9 +9,14 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { checkElementWithAccessLint } from './a11y-accesslint-check';
 import type { AxeCheckResult } from './a11y-axe-check';
 import { checkElement, getCachedResult, hasCachedResult } from './a11y-axe-check';
+import type { ParentContext, PositionInSet } from './focus-types';
 import type { MappedIssue } from './map-violations';
+import { detectPatternIssues, patternViolationsToMappedIssues } from './pattern-detector';
+import type { VOAnnouncement } from './vo-engine';
+import { generateVOAnnouncement } from './vo-engine';
 
 // ============================================================================
 // ARIA Ownership Rules
@@ -73,35 +78,11 @@ const TAG_TO_IMPLICIT_ROLE: Record<string, string> = {
 /**
  * Roles that are landmarks (always announced by VoiceOver regardless of ownership).
  */
-/**
- * Landmark roles that VoiceOver announces for navigation context.
- * Note: dialog/alertdialog are NOT landmarks - they're announced when entering,
- * not for each element inside.
- */
-const LANDMARK_ROLES = new Set([
-  'navigation',
-  'main',
-  'banner',
-  'contentinfo',
-  'complementary',
-  'region',
-  'search',
-  'form',
-]);
-
 // ============================================================================
 // Types
 // ============================================================================
 
-export type PositionInSet = {
-  current: number;
-  total: number;
-} | null;
-
-export type ParentContext = {
-  role: string;
-  name: string | null;
-}[];
+export type { ParentContext, PositionInSet } from './focus-types';
 
 export type FocusedElementInfo = {
   element: HTMLElement;
@@ -109,7 +90,10 @@ export type FocusedElementInfo = {
   name: string;
   description: string | null;
   states: string[];
+  /** Primary string VoiceOver would speak (same as voOutput.text) */
   announcement: string;
+  /** Structured VoiceOver segments for teaching / breakdown */
+  voOutput: VOAnnouncement;
   selector: string;
   snippet: string; // Truncated HTML snippet
   // Enhanced context
@@ -194,13 +178,6 @@ function getValidOwningParent(
   }
 
   return null; // No valid parent found
-}
-
-/**
- * Check if a role is a landmark role.
- */
-function isLandmarkRole(role: string): boolean {
-  return LANDMARK_ROLES.has(role);
 }
 
 // ============================================================================
@@ -532,7 +509,11 @@ function getParentContext(
   // 1. If there's a valid owning parent, include it first
   if (validParent) {
     const name = getContainerName(validParent.element);
-    context.push({ role: validParent.role, name });
+    context.push({
+      role: validParent.role,
+      name,
+      containerElement: validParent.element,
+    });
   }
 
   // 2. Continue up the tree for landmarks and other meaningful context
@@ -553,6 +534,7 @@ function getParentContext(
     'search',
     'form',
     // Other meaningful containers
+    'list',
     'toolbar',
     'article',
   ]);
@@ -564,7 +546,17 @@ function getParentContext(
 
     if (parentRole && announcedContainerRoles.has(parentRole)) {
       const name = getContainerName(current);
-      context.push({ role: parentRole, name });
+      const entry: ParentContext[number] = {
+        role: parentRole,
+        name,
+        containerElement: current,
+      };
+
+      if (parentRole === 'list') {
+        entry.itemCount = current.querySelectorAll(':scope > li, :scope > [role="listitem"]').length;
+      }
+
+      context.push(entry);
     }
 
     current = current.parentElement;
@@ -596,77 +588,6 @@ function getHeadingLevel(element: HTMLElement): number | null {
   }
 
   return null;
-}
-
-/**
- * Generate a screen reader announcement for an element.
- * Simulates what VoiceOver would actually say, respecting ARIA ownership rules.
- */
-function generateAnnouncement(
-  role: string,
-  name: string,
-  states: string[],
-  positionInSet: PositionInSet,
-  parentContext: ParentContext,
-  level: number | null,
-  hasValidOwnership: boolean,
-): string {
-  const parts: string[] = [];
-
-  // Name first
-  if (name) parts.push(name);
-
-  // Role (with some normalization)
-  const roleLabel = role === 'generic' ? '' : role;
-  if (roleLabel) {
-    // Add level for headings
-    if (role === 'heading' && level !== null) {
-      parts.push(`heading level ${level}`);
-    } else {
-      parts.push(roleLabel);
-    }
-  }
-
-  // States
-  if (states.length > 0) {
-    parts.push(states.join(', '));
-  }
-
-  // Position in set - only if ownership is valid or explicitly set via ARIA
-  // VoiceOver doesn't announce position for orphaned roles
-  if (positionInSet) {
-    parts.push(`${positionInSet.current} of ${positionInSet.total}`);
-  }
-
-  // Parent context - only announce what VoiceOver would actually say
-  if (parentContext.length > 0) {
-    const immediateContext = parentContext[0];
-
-    // Determine if we should announce this context
-    // Note: VoiceOver announces dialog when entering, not for each element inside
-    const shouldAnnounce =
-      // Always announce if ownership is valid and it's a container type
-      (hasValidOwnership &&
-        ['list', 'menu', 'menubar', 'listbox', 'tree', 'tablist', 'radiogroup'].includes(
-          immediateContext.role,
-        )) ||
-      // Always announce landmarks
-      isLandmarkRole(immediateContext.role) ||
-      // Announce if container has a name (but not unnamed dialogs)
-      (immediateContext.name &&
-        immediateContext.role !== 'dialog' &&
-        immediateContext.role !== 'alertdialog');
-
-    if (shouldAnnounce) {
-      if (immediateContext.name) {
-        parts.push(`in ${immediateContext.role} "${immediateContext.name}"`);
-      } else {
-        parts.push(`in ${immediateContext.role}`);
-      }
-    }
-  }
-
-  return parts.join(', ') || 'No announcement';
 }
 
 /**
@@ -738,7 +659,72 @@ function getElementSnippet(element: HTMLElement, maxLength = 200): string {
   return openTag + '...';
 }
 
-function getElementInfo(element: HTMLElement): FocusedElementInfo {
+/**
+ * Keys that move highlight inside composite widgets (listbox, menu, tabs, grid)
+ * without always moving DOM focus — we re-sync after these so the panel matches
+ * aria-activedescendant and roving tabindex updates.
+ */
+const COMPOSITE_NAVIGATION_KEYS = new Set([
+  'ArrowUp',
+  'ArrowDown',
+  'ArrowLeft',
+  'ArrowRight',
+  'Home',
+  'End',
+  'PageUp',
+  'PageDown',
+]);
+
+/**
+ * Resolve the element the user experiences as "focused" in composites.
+ * When DOM focus stays on a combobox/listbox container, aria-activedescendant
+ * points at the highlighted option/item.
+ */
+function getEffectiveFocusTarget(focused: HTMLElement): HTMLElement {
+  let node: HTMLElement | null = focused;
+  let depth = 0;
+  while (node && node !== document.body && depth < 12) {
+    const idRaw = node.getAttribute('aria-activedescendant');
+    if (idRaw?.trim()) {
+      const byId = document.getElementById(idRaw.trim());
+      if (byId instanceof HTMLElement) {
+        return byId;
+      }
+    }
+    node = node.parentElement;
+    depth++;
+  }
+  return focused;
+}
+
+function isInsideA11yPanel(element: HTMLElement): boolean {
+  return element.closest('[data-a11y-panel]') !== null;
+}
+
+/** Arrow keys in these controls move the caret / value, not a composite highlight. */
+function isTextEntryElement(element: HTMLElement): boolean {
+  if (element instanceof HTMLTextAreaElement) return true;
+  if (element.isContentEditable) return true;
+  if (element instanceof HTMLInputElement) {
+    const type = element.type;
+    return (
+      type === 'text' ||
+      type === 'search' ||
+      type === 'email' ||
+      type === 'url' ||
+      type === 'tel' ||
+      type === 'password' ||
+      type === '' ||
+      type === 'number'
+    );
+  }
+  return false;
+}
+
+function getElementInfo(
+  element: HTMLElement,
+  previousContextContainer: HTMLElement | null = null,
+): FocusedElementInfo {
   const role = getComputedRole(element);
   const name = getComputedName(element);
   const description = getComputedDescription(element);
@@ -764,16 +750,17 @@ function getElementInfo(element: HTMLElement): FocusedElementInfo {
   const positionInSet = getPositionInSet(element, role, validParent);
   const parentContext = getParentContext(element, role, validParent);
 
-  // Generate announcement respecting ownership rules
-  const announcement = generateAnnouncement(
+  const voOutput = generateVOAnnouncement({
+    element,
     role,
     name,
-    states,
+    description,
+    level,
     positionInSet,
     parentContext,
-    level,
     hasValidOwnership,
-  );
+    previousContextContainer,
+  });
 
   return {
     element,
@@ -781,7 +768,8 @@ function getElementInfo(element: HTMLElement): FocusedElementInfo {
     name,
     description,
     states,
-    announcement,
+    announcement: voOutput.text,
+    voOutput,
     selector,
     snippet,
     positionInSet,
@@ -790,6 +778,41 @@ function getElementInfo(element: HTMLElement): FocusedElementInfo {
     hasValidOwnership,
     ownershipIssue,
   };
+}
+
+/**
+ * Merge axe and AccessLint issues, skipping AccessLint duplicates
+ * when axe already reported a violation with the same title text.
+ */
+function mergeIssues(
+  patternIssues: MappedIssue[],
+  axeIssues: MappedIssue[],
+  alIssues: MappedIssue[],
+): MappedIssue[] {
+  const seen = new Set<string>();
+  const out: MappedIssue[] = [];
+
+  for (const i of patternIssues) {
+    const k = `p:${i.title.toLowerCase()}`;
+    if (seen.has(k)) continue;
+    seen.add(k);
+    out.push(i);
+  }
+  for (const i of axeIssues) {
+    const k = `a:${i.id}`;
+    if (seen.has(k)) continue;
+    seen.add(k);
+    out.push(i);
+  }
+  const axeTitles = new Set(axeIssues.map((i) => i.title.toLowerCase()));
+  for (const i of alIssues) {
+    if (axeTitles.has(i.title.toLowerCase())) continue;
+    const k = `al:${i.title.toLowerCase()}`;
+    if (seen.has(k)) continue;
+    seen.add(k);
+    out.push(i);
+  }
+  return out;
 }
 
 /**
@@ -806,6 +829,9 @@ export function useFocusTracking(isEnabled: boolean): FocusTrackingResult {
   const [axeResult, setAxeResult] = useState<AxeCheckResult | null>(null);
 
   const checkTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const compositeNavSyncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** Closest announced container from previous focus — skip repeating list/landmark in VO string */
+  const previousContextContainerRef = useRef<HTMLElement | null>(null);
 
   // Update navigation context
   const updateNavigation = useCallback((focusedElement: HTMLElement) => {
@@ -820,73 +846,149 @@ export function useFocusTracking(isEnabled: boolean): FocusTrackingResult {
     }
   }, []);
 
-  // Run axe check with debounce
+  // Run axe + AccessLint checks with debounce
   const runCheck = useCallback(async (element: HTMLElement) => {
-    // Check cache first
+    const patternMapped = patternViolationsToMappedIssues(detectPatternIssues(element));
+
+    // Check cache first (axe only)
     if (hasCachedResult(element)) {
       const cached = getCachedResult(element)!;
       setAxeResult(cached);
-      setIssues(cached.issues);
+
+      const alIssues = await checkElementWithAccessLint(element);
+      setIssues(mergeIssues(patternMapped, cached.issues, alIssues));
       return;
     }
 
     setIsChecking(true);
 
     try {
-      const result = await checkElement(element);
-      setAxeResult(result);
-      setIssues(result.issues);
+      const [axeResult, alIssues] = await Promise.all([
+        checkElement(element),
+        checkElementWithAccessLint(element),
+      ]);
+
+      setAxeResult(axeResult);
+      setIssues(mergeIssues(patternMapped, axeResult.issues, alIssues));
     } catch {
       setAxeResult(null);
-      setIssues([]);
+      setIssues(patternMapped);
     } finally {
       setIsChecking(false);
     }
   }, []);
 
-  // Handle focus change
+  // Handle focus change + composite / control updates that don't fire focusin
   useEffect(() => {
     if (!isEnabled) return;
 
-    const handleFocus = (event: FocusEvent) => {
-      const target = event.target as HTMLElement;
+    /**
+     * `domFocusElement` is the node that actually has DOM focus (tab order).
+     * Panel content + highlight use the effective target (e.g. activedescendant option).
+     */
+    const applyFocusSync = (domFocusElement: HTMLElement | null) => {
+      if (!domFocusElement || domFocusElement === document.body) return;
+      if (isInsideA11yPanel(domFocusElement)) return;
 
-      // Ignore focus within the panel
-      if (target.closest('[data-a11y-panel]')) return;
-
-      const info = getElementInfo(target);
+      const effective = getEffectiveFocusTarget(domFocusElement);
+      const info = getElementInfo(effective, previousContextContainerRef.current);
+      previousContextContainerRef.current = info.parentContext[0]?.containerElement ?? null;
       setCurrent(info);
-      updateNavigation(target);
+      updateNavigation(domFocusElement);
 
-      // Clear previous timeout
       if (checkTimeoutRef.current) {
         clearTimeout(checkTimeoutRef.current);
       }
 
-      // Reset state while checking
       setAxeResult(null);
       setIssues([]);
 
-      // Debounced axe check (150ms - fast enough to feel instant)
       checkTimeoutRef.current = setTimeout(() => {
-        runCheck(target);
+        runCheck(effective);
       }, 150);
     };
 
+    const scheduleCompositeRefresh = () => {
+      if (compositeNavSyncTimeoutRef.current != null) {
+        clearTimeout(compositeNavSyncTimeoutRef.current);
+      }
+      // Defer so aria-activedescendant / roving tabindex updates land after the key handler.
+      compositeNavSyncTimeoutRef.current = setTimeout(() => {
+        compositeNavSyncTimeoutRef.current = null;
+        const ae = document.activeElement;
+        if (ae instanceof HTMLElement) {
+          applyFocusSync(ae);
+        }
+      }, 0);
+    };
+
+    const handleFocus = (event: FocusEvent) => {
+      const target = event.target as HTMLElement;
+      applyFocusSync(target);
+    };
+
+    const handleKeyDownCapture = (event: KeyboardEvent) => {
+      if (!COMPOSITE_NAVIGATION_KEYS.has(event.key)) return;
+      const ae = document.activeElement;
+      if (!(ae instanceof HTMLElement) || isInsideA11yPanel(ae)) return;
+      if (isTextEntryElement(ae)) return;
+      scheduleCompositeRefresh();
+    };
+
+    const handleChangeCapture = (event: Event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement) || isInsideA11yPanel(target)) return;
+      requestAnimationFrame(() => {
+        const ae = document.activeElement;
+        const domFocus =
+          ae instanceof HTMLElement && !isInsideA11yPanel(ae) ? ae : target;
+        applyFocusSync(domFocus);
+      });
+    };
+
+    const handleClickCapture = (event: MouseEvent) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement) || isInsideA11yPanel(target)) return;
+      const role = target.getAttribute('role');
+      const isToggleControl =
+        (target instanceof HTMLInputElement &&
+          (target.type === 'checkbox' || target.type === 'radio')) ||
+        role === 'checkbox' ||
+        role === 'switch' ||
+        role === 'menuitemcheckbox' ||
+        role === 'menuitemradio';
+      if (!isToggleControl) return;
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const ae = document.activeElement;
+          const domFocus =
+            ae instanceof HTMLElement && !isInsideA11yPanel(ae) ? ae : target;
+          applyFocusSync(domFocus);
+        });
+      });
+    };
+
     document.addEventListener('focusin', handleFocus);
+    document.addEventListener('keydown', handleKeyDownCapture, true);
+    document.addEventListener('change', handleChangeCapture, true);
+    document.addEventListener('click', handleClickCapture, true);
 
     // Initialize with currently focused element
     if (document.activeElement && document.activeElement !== document.body) {
-      const info = getElementInfo(document.activeElement as HTMLElement);
-      setCurrent(info);
-      updateNavigation(document.activeElement as HTMLElement);
-      runCheck(document.activeElement as HTMLElement);
+      applyFocusSync(document.activeElement as HTMLElement);
     }
 
     return () => {
       document.removeEventListener('focusin', handleFocus);
+      document.removeEventListener('keydown', handleKeyDownCapture, true);
+      document.removeEventListener('change', handleChangeCapture, true);
+      document.removeEventListener('click', handleClickCapture, true);
       if (checkTimeoutRef.current) {
         clearTimeout(checkTimeoutRef.current);
+      }
+      if (compositeNavSyncTimeoutRef.current != null) {
+        clearTimeout(compositeNavSyncTimeoutRef.current);
+        compositeNavSyncTimeoutRef.current = null;
       }
     };
   }, [isEnabled, updateNavigation, runCheck]);

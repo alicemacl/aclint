@@ -4,6 +4,7 @@
  * Visual highlight component that draws an outline around the focused element.
  */
 
+import type { RefObject } from 'react';
 import { useEffect, useState } from 'react';
 
 import { Portal } from '@ark-ui/react/portal';
@@ -13,6 +14,7 @@ import { css } from 'styled-system/css';
 type A11yHighlightProps = {
   element: HTMLElement | null;
   isVisible: boolean;
+  portalContainerRef?: RefObject<HTMLElement | null>;
 };
 
 type Position = {
@@ -22,7 +24,7 @@ type Position = {
   height: number;
 };
 
-export function A11yHighlight({ element, isVisible }: A11yHighlightProps) {
+export function A11yHighlight({ element, isVisible, portalContainerRef }: A11yHighlightProps) {
   const [position, setPosition] = useState<Position | null>(null);
 
   useEffect(() => {
@@ -33,9 +35,10 @@ export function A11yHighlight({ element, isVisible }: A11yHighlightProps) {
 
     const updatePosition = () => {
       const rect = element.getBoundingClientRect();
+      // Viewport coordinates (fixed positioning) — works when portaled to body or Shadow DOM.
       setPosition({
-        top: rect.top + window.scrollY,
-        left: rect.left + window.scrollX,
+        top: rect.top,
+        left: rect.left,
         width: rect.width,
         height: rect.height,
       });
@@ -58,7 +61,7 @@ export function A11yHighlight({ element, isVisible }: A11yHighlightProps) {
   }
 
   return (
-    <Portal>
+    <Portal container={portalContainerRef}>
       <div
         className={highlightStyles}
         style={{
@@ -74,7 +77,7 @@ export function A11yHighlight({ element, isVisible }: A11yHighlightProps) {
 }
 
 const highlightStyles = css({
-  position: 'absolute',
+  position: 'fixed',
   pointerEvents: 'none',
   border: '2px solid #3b82f6',
   borderRadius: '4px',

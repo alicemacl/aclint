@@ -36,6 +36,8 @@ export type MappedIssue = {
   axeDescription: string;
   // Reference to full assistant rule if available
   assistantRule?: AssistantRule;
+  // Which engine found this violation
+  source?: 'axe' | 'accesslint' | 'pattern';
 };
 
 export type AxeViolation = {
@@ -75,6 +77,7 @@ export function mapViolationsToIssues(violations: AxeViolation[]): MappedIssue[]
         axeHelp: violation.help,
         axeDescription: violation.description,
         assistantRule,
+        source: 'axe',
       };
     }
 
@@ -96,6 +99,7 @@ export function mapViolationsToIssues(violations: AxeViolation[]): MappedIssue[]
         learnMoreUrl: violation.helpUrl,
         axeHelp: violation.help,
         axeDescription: violation.description,
+        source: 'axe',
       };
     }
 
@@ -108,6 +112,7 @@ export function mapViolationsToIssues(violations: AxeViolation[]): MappedIssue[]
       learnMoreUrl: violation.helpUrl,
       axeHelp: violation.help,
       axeDescription: violation.description,
+      source: 'axe',
     };
   });
 }
