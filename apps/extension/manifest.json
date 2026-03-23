@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "A11y Lens Companion",
+  "version": "0.0.3",
+  "description": "Accessibility overlay (a11y companion) for any page — local dev build.",
+  "permissions": ["tabs", "scripting"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Toggle A11y Lens panel"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "commands": {
+    "toggle-a11y-panel": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+A",
+        "mac": "Command+Shift+A"
+      },
+      "description": "Toggle A11y Lens panel"
+    }
+  }
+}
