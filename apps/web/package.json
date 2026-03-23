@@ -7,20 +7,22 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "panda": "panda codegen",
-    "prepare": "panda codegen"
+    "prepare": "panda codegen",
+    "panda:watch": "panda codegen --watch"
   },
   "dependencies": {
     "@a11y-lens/a11y-companion": "workspace:*",
+    "@accesslint/core": "^0.8.8",
     "@ark-ui/react": "^5.31.0",
-    "next": "^15.0.0",
+    "lucide-react": "^0.460.0",
+    "next": "^16.1.6",
     "prettier": "^3.8.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
-    "@pandacss/dev": "^0.49.0",
+    "@pandacss/dev": "^1.8.2",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",

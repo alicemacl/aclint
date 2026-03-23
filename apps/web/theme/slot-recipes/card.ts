@@ -5,7 +5,7 @@ export const card = defineSlotRecipe({
   slots: ['root', 'header', 'body', 'footer', 'title', 'description'],
   base: {
     root: {
-      borderRadius: 'l3',
+      borderRadius: 'md',
       display: 'flex',
       flexDirection: 'column',
       overflow: 'hidden',

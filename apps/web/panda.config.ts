@@ -6,7 +6,7 @@ export default defineConfig({
   include: [
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
-    '../packages/a11y-companion/src/**/*.{ts,tsx}',
+    '../../packages/a11y-companion/src/**/*.{ts,tsx}',
   ],
   exclude: ['./node_modules'],
   outdir: 'styled-system',
@@ -20,7 +20,7 @@ export default defineConfig({
       margin: 0,
       padding: 0,
       fontFamily: 'system-ui',
-      backgroundColor: 'var(--colors-stone-300)',
+      backgroundColor: 'white',
     },
   },
 })
