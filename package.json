@@ -1,11 +1,11 @@
 {
-  "name": "a11y-lens",
+  "name": "aclint",
   "private": true,
   "packageManager": "pnpm@10.9.0",
   "scripts": {
     "dev": "turbo run dev panda:watch",
     "build": "turbo run build",
-    "build:extension": "pnpm --filter a11y-lens-extension build"
+    "build:extension": "pnpm --filter aclint-extension build"
   },
   "devDependencies": {
     "prettier": "^3.8.1",

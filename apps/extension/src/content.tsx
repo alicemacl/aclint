@@ -1,19 +1,19 @@
-import { A11yOverlay } from '@a11y-lens/a11y-companion';
+import { A11yOverlay } from '@aclint/lens';
 import type { RefObject } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import globalsCss from '../globals.css?inline';
 
-const EXT_HOST_ID = 'a11y-lens-companion-host';
+const EXT_HOST_ID = 'aclint-host';
 
 /** Shared with a second execution if the background script programmatically injects `content.js`. */
 const extensionToggleRef: { current: (() => void) | null } = { current: null };
 
-const g = globalThis as typeof globalThis & { __a11yLensMessageListener?: boolean };
+const g = globalThis as typeof globalThis & { __aclintMessageListener?: boolean };
 
 function setupMessageListenerOnce() {
-  if (g.__a11yLensMessageListener) return;
-  g.__a11yLensMessageListener = true;
+  if (g.__aclintMessageListener) return;
+  g.__aclintMessageListener = true;
 
   chrome.runtime.onMessage.addListener((msg: unknown) => {
     if (msg && typeof msg === 'object' && (msg as { type?: string }).type === 'toggle-panel') {
@@ -31,7 +31,7 @@ function inject() {
 
   const host = document.createElement('div');
   host.id = EXT_HOST_ID;
-  host.setAttribute('data-a11y-lens-extension-host', '');
+  host.setAttribute('data-aclint-extension-host', '');
   Object.assign(host.style, {
     position: 'fixed',
     inset: '0',

@@ -165,7 +165,7 @@ export function A11yPanel({
                   {view === 'main' ? (
                     <>
                       <GripVertical size={14} />
-                      <span>A11y</span>
+                      <span>ACLint</span>
                       <span className={badgeStyles}>{currentIndex}/{totalFocusable}</span>
                     </>
                   ) : (

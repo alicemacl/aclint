@@ -14,7 +14,7 @@ export const Hero = () => {
       gap="6"
     >
       <Box textStyle="4xl" fontWeight="bold" lineHeight="tight">
-        A11y Lens
+        ACLint
       </Box>
       <Box fontSize="lg" color="slate.600" maxWidth="560px">
         Real-time accessibility feedback while you build. Know what screen readers announce,
@@ -72,7 +72,7 @@ export const Hero = () => {
         </Link>
       </Box>
 
-      <Box fontSize="xs" color="slate.400" marginTop="8">
+      <Box fontSize="xs" color="slate.600" marginTop="8">
         Open-source · Works with any framework · Desktop Chrome extension + npm embed
       </Box>
     </Box>

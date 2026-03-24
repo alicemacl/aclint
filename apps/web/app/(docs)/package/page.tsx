@@ -3,8 +3,8 @@ import { Box } from '@/src/components/layout'
 import { PackageDocs } from '@/src/page-components/package-docs/package-docs'
 
 export const metadata: Metadata = {
-  title: 'npm Package – A11y Lens',
-  description: 'Install and use @a11y-lens/a11y-companion for real-time accessibility feedback during development.',
+  title: 'npm Package – ACLint',
+  description: 'Install and use @aclint/lens for real-time accessibility feedback during development.',
 }
 
 export default function PackagePage() {

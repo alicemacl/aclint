@@ -3,7 +3,7 @@ import { A11yDevToolsWrapper } from './A11yDevToolsWrapper'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'A11y Lens',
+  title: 'ACLint',
   description: 'Real-time accessibility feedback for developers — npm package and Chrome extension.',
 }
 

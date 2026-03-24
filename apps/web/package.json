@@ -7,11 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test:a11y": "playwright test --project=a11y",
     "prepare": "panda codegen",
     "panda:watch": "panda codegen --watch"
   },
   "dependencies": {
-    "@a11y-lens/a11y-companion": "workspace:*",
+    "@aclint/lens": "workspace:*",
     "@accesslint/core": "^0.8.8",
     "@ark-ui/react": "^5.31.0",
     "lucide-react": "^0.460.0",
@@ -21,8 +22,10 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@aclint/playwright": "workspace:*",
     "@eslint/eslintrc": "^3.2.0",
     "@pandacss/dev": "^1.8.2",
+    "@playwright/test": "^1.52.0",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",

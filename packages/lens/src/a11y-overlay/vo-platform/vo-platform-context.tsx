@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { VoPlatform } from './vo-platform-types';
 
-const STORAGE_KEY = 'a11y-lens:vo-platform';
+const STORAGE_KEY = 'aclint:vo-platform';
 
 function detectDefaultPlatform(): VoPlatform {
   if (typeof navigator === 'undefined') return 'macos';

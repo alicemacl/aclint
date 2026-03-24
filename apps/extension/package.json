@@ -1,5 +1,5 @@
 {
-  "name": "a11y-lens-extension",
+  "name": "aclint-extension",
   "version": "0.0.1",
   "private": true,
   "type": "module",
@@ -9,7 +9,7 @@
     "dev": "pnpm prepare && vite build --watch"
   },
   "dependencies": {
-    "@a11y-lens/a11y-companion": "workspace:*",
+    "@aclint/lens": "workspace:*",
     "@accesslint/core": "^0.8.8",
     "@ark-ui/react": "^5.31.0",
     "axe-core": "^4.10.0",

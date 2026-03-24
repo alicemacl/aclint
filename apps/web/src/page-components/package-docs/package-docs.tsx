@@ -1,7 +1,7 @@
 'use client'
 
 import { Box } from '@/src/components/layout'
-import { useVoPlatform, type VoPlatform } from '@a11y-lens/a11y-companion'
+import { useVoPlatform, type VoPlatform } from '@aclint/lens'
 
 export function PackageDocs() {
   const { platform, setPlatform } = useVoPlatform()
@@ -10,7 +10,7 @@ export function PackageDocs() {
     <Box paddingX="4" paddingY="2" display="flex" flexDirection="column" gap="6">
       <Box>
         <Box textStyle="xl" fontWeight="bold">
-          @a11y-lens/a11y-companion
+          @aclint/lens
         </Box>
         <Box fontSize="sm" color="slate.600" marginTop="1">
           Embed real-time accessibility feedback directly in your development environment.
@@ -28,14 +28,14 @@ export function PackageDocs() {
       </Section>
 
       <Section title="Install">
-        <CodeBlock>npm install @a11y-lens/a11y-companion</CodeBlock>
+        <CodeBlock>npm install @aclint/lens</CodeBlock>
       </Section>
 
       <Section title="Quick start">
         <Box fontSize="sm" color="slate.700" marginBottom="2">
           Wrap your app root with the dev tools component. It only renders in development mode.
         </Box>
-        <CodeBlock>{`import { A11yDevTools } from '@a11y-lens/a11y-companion'
+        <CodeBlock>{`import { A11yDevTools } from '@aclint/lens'
 
 export default function App() {
   return (
@@ -149,6 +149,7 @@ function Kbd({ children }: { children: React.ReactNode }) {
       display="inline"
       padding="0 4px"
       backgroundColor="slate.200"
+      color="slate.800"
       borderRadius="sm"
       fontSize="xs"
       fontFamily="monospace"
