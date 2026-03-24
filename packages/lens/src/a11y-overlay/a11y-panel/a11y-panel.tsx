@@ -52,6 +52,8 @@ import {
 } from './panel-styles-shell'
 import type { A11yPanelProps, PanelView, Stage } from './panel-types'
 
+const BEHAVIORAL_SOURCES = new Set(['pattern', 'interaction'])
+
 export function A11yPanel({
   isOpen,
   onOpenChange,
@@ -79,8 +81,8 @@ export function A11yPanel({
 
   const activeSimCount = Object.values(simulations).filter(Boolean).length
 
-  const patternIssues = issues.filter((i) => i.source === 'pattern')
-  const wcagIssues = issues.filter((i) => i.source !== 'pattern')
+  const patternIssues = issues.filter((i) => BEHAVIORAL_SOURCES.has(i.source ?? ''))
+  const wcagIssues = issues.filter((i) => !BEHAVIORAL_SOURCES.has(i.source ?? ''))
   const sortedPatternIssues = sortBySeverity(patternIssues)
   const sortedWcagIssues = sortBySeverity(wcagIssues)
 
