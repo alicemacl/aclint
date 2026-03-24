@@ -13,8 +13,7 @@ export default function PackagePage() {
       as="main"
       padding="4"
       backgroundColor="white"
-      borderRadius="md"
-      border="1px solid"
+      borderLeft="1px solid"
       borderColor="slate.300"
       overflowY="auto"
     >

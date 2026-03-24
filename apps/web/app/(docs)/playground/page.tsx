@@ -1,10 +1,11 @@
-import type { Metadata } from 'next'
 import { Box } from '@/src/components/layout'
 import { Dashboard } from '@/src/page-components/dashboard'
+import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Playground – ACLint',
-  description: 'Interactive accessibility playground — test VoiceOver output, pattern detection, and WCAG checks.',
+  description:
+    'Interactive accessibility playground — test VoiceOver output, pattern detection, and WCAG checks.',
 }
 
 export default function PlaygroundPage() {
@@ -13,8 +14,7 @@ export default function PlaygroundPage() {
       as="main"
       padding="4"
       backgroundColor="white"
-      borderRadius="md"
-      border="1px solid"
+      borderLeft="1px solid"
       borderColor="slate.300"
       overflowY="auto"
     >
