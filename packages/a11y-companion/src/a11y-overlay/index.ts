@@ -55,3 +55,7 @@ export {
   DEFAULT_SIMULATION_SETTINGS,
 } from './simulations';
 export type { SimulationSettings } from './simulations';
+
+// VoiceOver platform awareness
+export { VoPlatformProvider, useVoPlatform, getVoiceOverSteps, VO_PLATFORM_LABELS } from './vo-platform';
+export type { VoPlatform } from './vo-platform';

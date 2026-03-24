@@ -91,6 +91,33 @@ export const highlightIconStyles = css({
   borderRadius: 'sm',
 });
 
+export const platformToggleStyles = css({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '2px',
+  padding: '2px 6px',
+  borderRadius: 'sm',
+  fontSize: '10px',
+  fontWeight: 'semibold',
+  color: 'gray.400',
+  cursor: 'pointer',
+  transition: 'all 0.15s',
+  _hover: { backgroundColor: 'gray.700', color: 'white' },
+});
+
+export const platformActiveSegmentStyles = css({
+  backgroundColor: 'blue.600',
+  color: 'white',
+  padding: '1px 5px',
+  borderRadius: 'sm',
+  fontSize: '10px',
+});
+
+export const platformInactiveSegmentStyles = css({
+  padding: '1px 5px',
+  fontSize: '10px',
+});
+
 // Simulations menu
 export const simBadgeStyles = css({
   position: 'absolute',
