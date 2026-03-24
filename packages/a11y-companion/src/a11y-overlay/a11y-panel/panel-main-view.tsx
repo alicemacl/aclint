@@ -7,6 +7,7 @@ import { cx } from 'styled-system/css';
 
 import type { MappedIssue } from '../map-violations';
 import type { FocusedElementInfo } from '../use-focus-tracking';
+import { useVoPlatform, VO_PLATFORM_LABELS } from '../vo-platform';
 import { IssueCard } from './panel-issue-card';
 import { NavButton } from './panel-nav-button';
 import {
@@ -89,6 +90,7 @@ export function MainView({
   onFocusNext,
 }: MainViewProps) {
   const [showVoBreakdown, setShowVoBreakdown] = useState(false);
+  const { platform } = useVoPlatform();
 
   if (!current) {
     return (
@@ -105,7 +107,7 @@ export function MainView({
     <div className={mainViewStyles}>
       <div className={announcementBoxStyles}>
         <div className={announcementHeaderStyles}>
-          <span className={announcementTitleStyles}>VoiceOver (macOS) says</span>
+          <span className={announcementTitleStyles}>VoiceOver ({VO_PLATFORM_LABELS[platform]}) says</span>
           <button
             className={iconButtonStyles}
             onClick={onCopyAnnouncement}
@@ -118,7 +120,7 @@ export function MainView({
         </div>
         <p className={announcementTextStyles}>&ldquo;{current.announcement}&rdquo;</p>
         <p className={voHintStyles}>
-          Approximation for learning — verify with VoiceOver (VO) on a real device.
+          Approximation for learning — verify with VoiceOver on a real {platform === 'ios' ? 'iOS' : 'Mac'} device.
         </p>
         <div
           className={snippetToggleStyles}

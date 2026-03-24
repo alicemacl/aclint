@@ -4,6 +4,7 @@ import { AlertTriangle } from 'lucide-react';
 
 import { getRequiredParentGuidance, type VoiceOverTest } from '../assistant-rules';
 import type { VoiceOverGuide } from '../fix-guidance';
+import { useVoPlatform, getVoiceOverSteps } from '../vo-platform';
 import {
   contextGuidanceStyles,
   inlineVoGuideStyles,
@@ -30,9 +31,11 @@ export function ContextSpecificGuidance({ role }: { role: string }) {
 
 export function InlineVoiceOverGuide({ guide }: { guide: VoiceOverTest | VoiceOverGuide }) {
   const isNewFormat = 'expectedOutput' in guide;
+  const { platform } = useVoPlatform();
 
   const goal = isNewFormat ? (guide as VoiceOverTest).goal : (guide as VoiceOverGuide).goal;
-  const steps = isNewFormat ? (guide as VoiceOverTest).steps : (guide as VoiceOverGuide).steps;
+  const macosSteps = isNewFormat ? (guide as VoiceOverTest).steps : (guide as VoiceOverGuide).steps;
+  const steps = getVoiceOverSteps(platform, macosSteps);
   const expectedOutput = isNewFormat
     ? (guide as VoiceOverTest).expectedOutput
     : (guide as VoiceOverGuide).expect;

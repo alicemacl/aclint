@@ -30,6 +30,7 @@ import {
 } from '../simulations';
 import type { MappedIssue } from '../map-violations';
 import { sortBySeverity } from '../map-violations';
+import { useVoPlatform } from '../vo-platform';
 import { FixView } from './panel-fix-view';
 import { MainView } from './panel-main-view';
 import type { A11yPanelProps, Stage, PanelView } from './panel-types';
@@ -44,6 +45,9 @@ import {
   dragTriggerStyles,
   headerStyles,
   highlightIconStyles,
+  platformActiveSegmentStyles,
+  platformInactiveSegmentStyles,
+  platformToggleStyles,
   positionerStyles,
   resizeCornerStyles,
   resizeTriggerStyles,
@@ -65,6 +69,7 @@ export function A11yPanel({
   portalContainerRef,
 }: A11yPanelProps) {
   const { current, prev, next, totalFocusable, currentIndex, issues, isChecking } = focusInfo;
+  const { platform, togglePlatform } = useVoPlatform();
   const [stage, setStage] = useState<Stage>('default');
   const [view, setView] = useState<PanelView>('main');
   const [selectedIssue, setSelectedIssue] = useState<MappedIssue | null>(null);
@@ -177,6 +182,20 @@ export function A11yPanel({
                 </FloatingPanel.Title>
               </FloatingPanel.DragTrigger>
               <FloatingPanel.Control className={controlStyles}>
+                <button
+                  className={platformToggleStyles}
+                  onClick={togglePlatform}
+                  onMouseDown={(e) => e.preventDefault()}
+                  tabIndex={-1}
+                  title={`VoiceOver platform: ${platform === 'macos' ? 'macOS' : 'iOS'}`}
+                >
+                  <span className={platform === 'macos' ? platformActiveSegmentStyles : platformInactiveSegmentStyles}>
+                    Mac
+                  </span>
+                  <span className={platform === 'ios' ? platformActiveSegmentStyles : platformInactiveSegmentStyles}>
+                    iOS
+                  </span>
+                </button>
                 <button
                   className={cx(controlButtonStyles, showHighlight && activeButtonStyles)}
                   onClick={onToggleHighlight}

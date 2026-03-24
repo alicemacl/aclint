@@ -1,4 +1,4 @@
-import { HomeIcon, List, Settings, User } from 'lucide-react'
+import { Chrome, HomeIcon, Package, Play } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '../components/buttons'
 import { Box, Span } from '../components/layout'
@@ -14,18 +14,22 @@ export default function Sidebar() {
       flexDirection="column"
       gap="4"
     >
-      <Box textStyle="lg" fontWeight="bold" textTransform="uppercase">
-        A11y Lens
-      </Box>
-      <Box as="ul" width="100%">
-        {items.map((item) => (
-          <SidebarItem
-            key={item.href}
-            icon={<item.icon size={16} />}
-            label={item.label}
-            href={item.href}
-          />
-        ))}
+      <Link href="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <Box textStyle="lg" fontWeight="bold" textTransform="uppercase">
+          A11y Lens
+        </Box>
+      </Link>
+      <Box as="nav">
+        <Box as="ul" width="100%" listStyleType="none" padding="0" margin="0">
+          {items.map((item) => (
+            <SidebarItem
+              key={item.href}
+              icon={<item.icon size={16} />}
+              label={item.label}
+              href={item.href}
+            />
+          ))}
+        </Box>
       </Box>
     </Box>
   )
@@ -41,34 +45,31 @@ const SidebarItem = ({
   href: string
 }) => {
   return (
-    <Button asChild width="100%" justifyContent="start">
-      <Span>
-        <Span>{icon}</Span>
-        <Link href={href}>{label}</Link>
-      </Span>
-    </Button>
+    <Box as="li">
+      <Button asChild width="100%" justifyContent="start">
+        <Link href={href}>
+          <Span>{icon}</Span>
+          <Span>{label}</Span>
+        </Link>
+      </Button>
+    </Box>
   )
 }
 
 const items = [
   {
-    icon: HomeIcon,
-    label: 'Dashboard',
-    href: '/',
+    icon: Play,
+    label: 'Playground',
+    href: '/playground',
   },
   {
-    icon: List,
-    label: 'Tasks',
-    href: '/tasks',
+    icon: Package,
+    label: 'npm Package',
+    href: '/package',
   },
   {
-    icon: Settings,
-    label: 'Settings',
-    href: '/settings',
-  },
-  {
-    icon: User,
-    label: 'Profile',
-    href: '/profile',
+    icon: Chrome,
+    label: 'Chrome Extension',
+    href: '/extension',
   },
 ]

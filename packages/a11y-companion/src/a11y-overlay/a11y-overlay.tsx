@@ -11,6 +11,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { A11yHighlight } from './a11y-highlight';
 import { A11yPanel } from './a11y-panel';
 import { useFocusTracking } from './use-focus-tracking';
+import { VoPlatformProvider } from './vo-platform';
 
 export type A11yOverlayProps = {
   /**
@@ -85,7 +86,7 @@ export function A11yOverlay({
   }, []);
 
   return (
-    <>
+    <VoPlatformProvider>
       <A11yHighlight
         element={focusInfo.current?.element ?? null}
         isVisible={isOpen && showHighlight}
@@ -99,6 +100,6 @@ export function A11yOverlay({
         onToggleHighlight={handleToggleHighlight}
         portalContainerRef={portalContainerRef}
       />
-    </>
+    </VoPlatformProvider>
   );
 }
