@@ -6,10 +6,12 @@
  */
 
 import type { MutableRefObject, RefObject } from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { A11yHighlight } from './a11y-highlight';
 import { A11yPanel } from './a11y-panel';
+import { useActivationMonitor } from './interaction-monitor';
+import type { MappedIssue } from './map-violations';
 import { useFocusTracking } from './use-focus-tracking';
 import { VoPlatformProvider } from './vo-platform';
 
@@ -40,6 +42,31 @@ export function A11yOverlay({
 
   // Focus tracking is only active when panel is open
   const focusInfo = useFocusTracking(isOpen);
+
+  const [interactionIssues, setInteractionIssues] = useState<MappedIssue[]>([]);
+
+  const addInteractionIssue = useCallback((issue: MappedIssue) => {
+    setInteractionIssues((prev) => {
+      if (prev.some((i) => i.id === issue.id)) return prev;
+      return [...prev, issue];
+    });
+  }, []);
+
+  useActivationMonitor(isOpen, addInteractionIssue);
+
+  // Clear interaction issues when focus changes
+  const currentElement = focusInfo.current?.element ?? null;
+  useEffect(() => {
+    setInteractionIssues([]);
+  }, [currentElement]);
+
+  const enrichedFocusInfo = useMemo(
+    () => ({
+      ...focusInfo,
+      issues: [...focusInfo.issues, ...interactionIssues],
+    }),
+    [focusInfo, interactionIssues],
+  );
 
   // Toggle panel with keyboard shortcut
   useEffect(() => {
@@ -94,7 +121,7 @@ export function A11yOverlay({
       <A11yPanel
         isOpen={isOpen}
         onOpenChange={setIsOpen}
-        focusInfo={focusInfo}
+        focusInfo={enrichedFocusInfo}
         showHighlight={showHighlight}
         onToggleHighlight={handleToggleHighlight}
         portalContainerRef={portalContainerRef}

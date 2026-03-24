@@ -37,7 +37,7 @@ export type MappedIssue = {
   // Reference to full assistant rule if available
   assistantRule?: AssistantRule;
   // Which engine found this violation
-  source?: 'axe' | 'accesslint' | 'pattern';
+  source?: 'axe' | 'accesslint' | 'pattern' | 'hover-contrast' | 'interaction';
 };
 
 export type AxeViolation = {

@@ -7,6 +7,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { checkElementWithAccessLint } from '../a11y-accesslint-check';
 import type { AxeCheckResult } from '../a11y-axe-check';
 import { checkElement, getCachedResult, hasCachedResult } from '../a11y-axe-check';
+import { checkHoverContrast } from '../hover-contrast';
 import type { MappedIssue } from '../map-violations';
 import { detectPatternIssues, patternViolationsToMappedIssues } from '../pattern-detector';
 import {
@@ -51,12 +52,15 @@ export function useFocusTracking(isEnabled: boolean): FocusTrackingResult {
   const runCheck = useCallback(async (element: HTMLElement) => {
     const patternMapped = patternViolationsToMappedIssues(detectPatternIssues(element));
 
+    const hoverIssue = checkHoverContrast(element);
+    const extra: MappedIssue[] = hoverIssue ? [hoverIssue] : [];
+
     if (hasCachedResult(element)) {
       const cached = getCachedResult(element)!;
       setAxeResult(cached);
 
       const alIssues = await checkElementWithAccessLint(element);
-      setIssues(mergeIssues(patternMapped, cached.issues, alIssues));
+      setIssues([...mergeIssues(patternMapped, cached.issues, alIssues), ...extra]);
       return;
     }
 
@@ -69,10 +73,10 @@ export function useFocusTracking(isEnabled: boolean): FocusTrackingResult {
       ]);
 
       setAxeResult(axeResult);
-      setIssues(mergeIssues(patternMapped, axeResult.issues, alIssues));
+      setIssues([...mergeIssues(patternMapped, axeResult.issues, alIssues), ...extra]);
     } catch {
       setAxeResult(null);
-      setIssues(patternMapped);
+      setIssues([...patternMapped, ...extra]);
     } finally {
       setIsChecking(false);
     }
