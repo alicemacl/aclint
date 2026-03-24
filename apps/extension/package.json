@@ -6,7 +6,8 @@
   "scripts": {
     "prepare": "panda codegen",
     "build": "pnpm prepare && vite build && vite build --config vite.background.config.ts && cp manifest.json dist/",
-    "dev": "pnpm prepare && vite build --watch"
+    "dev": "pnpm prepare && vite build --watch",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@aclint/lens": "workspace:*",
