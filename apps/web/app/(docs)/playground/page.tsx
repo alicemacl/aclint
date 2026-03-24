@@ -12,10 +12,11 @@ export default function PlaygroundPage() {
   return (
     <Box
       as="main"
-      padding="4"
+      maxWidth="1100px"
+      marginX="auto"
+      paddingX={{ base: '4', md: '6' }}
+      paddingY="4"
       backgroundColor="white"
-      borderLeft="1px solid"
-      borderColor="slate.300"
       overflowY="auto"
     >
       <Dashboard />

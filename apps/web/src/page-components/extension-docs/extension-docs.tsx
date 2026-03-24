@@ -21,6 +21,9 @@ export function ExtensionDocs() {
         <Box as="ul" fontSize="sm" color="slate.700" display="flex" flexDirection="column" gap="1" paddingLeft="4">
           <Box as="li">Injects the ACLint panel onto any page in Chrome</Box>
           <Box as="li">Same VoiceOver preview, pattern detection, and WCAG checks as the npm package</Box>
+          <Box as="li">
+            Works alongside active VoiceOver sessions to compare expected and observed announcements
+          </Box>
           <Box as="li">Toggle with the toolbar icon or <Kbd>Ctrl+Shift+A</Kbd></Box>
           <Box as="li">Works on localhost, staging, and production sites</Box>
         </Box>

@@ -18,12 +18,23 @@ export function PackageDocs() {
       </Box>
 
       <Section title="What it does">
-        <Box as="ul" fontSize="sm" color="slate.700" display="flex" flexDirection="column" gap="1" paddingLeft="4">
+        <Box
+          as="ul"
+          fontSize="sm"
+          color="slate.700"
+          display="flex"
+          flexDirection="column"
+          gap="1"
+          paddingLeft="4"
+        >
           <Box as="li">Previews VoiceOver announcements for the focused element</Box>
           <Box as="li">Runs axe-core and AccessLint checks on focus</Box>
           <Box as="li">Detects semantic patterns that Lighthouse-style tools miss</Box>
           <Box as="li">Shows fix guidance with code examples and VoiceOver testing steps</Box>
           <Box as="li">Supports macOS and iOS VoiceOver guidance</Box>
+          <Box as="li">
+            Works alongside VoiceOver while it is active to validate announcements in real time
+          </Box>
         </Box>
       </Section>
 
@@ -51,12 +62,31 @@ export default function App() {
       </Section>
 
       <Section title="Key exports">
-        <Box as="ul" fontSize="sm" color="slate.700" display="flex" flexDirection="column" gap="1" paddingLeft="4">
-          <Box as="li"><Code>A11yDevTools</Code> — drop-in component (dev-only)</Box>
-          <Box as="li"><Code>A11yOverlay</Code> — full overlay for custom setups or the extension</Box>
-          <Box as="li"><Code>VoPlatformProvider</Code> / <Code>useVoPlatform</Code> — shared VoiceOver platform context</Box>
-          <Box as="li"><Code>useFocusTracking</Code> — hook for tracking focused element details</Box>
-          <Box as="li"><Code>generateVOAnnouncement</Code> — synthesise a VoiceOver announcement string</Box>
+        <Box
+          as="ul"
+          fontSize="sm"
+          color="slate.700"
+          display="flex"
+          flexDirection="column"
+          gap="1"
+          paddingLeft="4"
+        >
+          <Box as="li">
+            <Code>A11yDevTools</Code> — drop-in component (dev-only)
+          </Box>
+          <Box as="li">
+            <Code>A11yOverlay</Code> — full overlay for custom setups or the extension
+          </Box>
+          <Box as="li">
+            <Code>VoPlatformProvider</Code> / <Code>useVoPlatform</Code> — shared VoiceOver platform
+            context
+          </Box>
+          <Box as="li">
+            <Code>useFocusTracking</Code> — hook for tracking focused element details
+          </Box>
+          <Box as="li">
+            <Code>generateVOAnnouncement</Code> — synthesise a VoiceOver announcement string
+          </Box>
         </Box>
       </Section>
 
@@ -81,18 +111,31 @@ export default function App() {
             </>
           ) : (
             <>
-              <strong>iOS:</strong> Enable VoiceOver in Settings → Accessibility → VoiceOver.
-              Swipe right to navigate. Rotate two fingers to open the Rotor.
+              <strong>iOS:</strong> Enable VoiceOver in Settings → Accessibility → VoiceOver. Swipe
+              right to navigate. Rotate two fingers to open the Rotor.
             </>
           )}
         </Box>
       </Section>
 
       <Section title="Limitations">
-        <Box as="ul" fontSize="sm" color="slate.700" display="flex" flexDirection="column" gap="1" paddingLeft="4">
+        <Box
+          as="ul"
+          fontSize="sm"
+          color="slate.700"
+          display="flex"
+          flexDirection="column"
+          gap="1"
+          paddingLeft="4"
+        >
           <Box as="li">VoiceOver output is an approximation — always verify on a real device</Box>
-          <Box as="li">Gradient text may cause false-positive contrast violations (filtered automatically)</Box>
-          <Box as="li">The panel is designed for desktop Chrome; for other browsers see the extension</Box>
+          <Box as="li">
+            Gradient text may cause false-positive contrast violations (filtered automatically)
+          </Box>
+          <Box as="li">
+            The panel can run while VoiceOver is active, but final verification should still be done
+            on real devices and target browsers
+          </Box>
         </Box>
       </Section>
     </Box>
@@ -169,7 +212,14 @@ function PlatformToggle({
   onChange: (p: VoPlatform) => void
 }) {
   return (
-    <Box display="flex" gap="1" padding="2px" backgroundColor="slate.100" borderRadius="md" width="fit-content">
+    <Box
+      display="flex"
+      gap="1"
+      padding="2px"
+      backgroundColor="slate.100"
+      borderRadius="md"
+      width="fit-content"
+    >
       <Box
         as="button"
         padding="4px 12px"
