@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint app/ src/",
+    "typecheck": "tsc --noEmit",
     "test:a11y": "playwright test --project=a11y",
     "prepare": "panda codegen",
     "panda:watch": "panda codegen --watch"

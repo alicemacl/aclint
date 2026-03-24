@@ -50,7 +50,6 @@ export function A11yOverlay({
         setIsOpen((prev) => {
           const next = !prev;
           if (next) {
-            // eslint-disable-next-line no-console
             console.log(
               '%c[A11y Panel] Opened - Press Tab to navigate',
               'color: #3b82f6; font-weight: bold;'

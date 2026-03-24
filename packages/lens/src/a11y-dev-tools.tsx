@@ -23,7 +23,6 @@ export function A11yDevTools() {
     setMounted(true);
 
     // Log instructions on mount
-    // eslint-disable-next-line no-console
     console.log(
       '%c♿ A11y Dev Tools loaded - Press Ctrl+Shift+A (Cmd+Shift+A on Mac) to toggle panel',
       'color: #3b82f6; font-weight: bold;',

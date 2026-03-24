@@ -7,7 +7,7 @@ import { buttonsLinksEntries } from './entries/buttons-links';
 import { headingsLandmarksEntries } from './entries/headings-landmarks';
 import { imagesFormsEntries } from './entries/images-forms';
 import { tablesEntries } from './entries/tables';
-import type { FixGuidance, VoiceOverGuide } from './types';
+import type { FixGuidance } from './types';
 
 export type { FixGuidance, VoiceOverGuide } from './types';
 

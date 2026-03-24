@@ -1,39 +1,30 @@
-'use client';
+'use client'
 
 /**
  * Simplified A11y Panel - Radically simple accessibility testing.
  * Shows what users experience, with progressive disclosure of fix guidance.
  */
 
-import type { MouseEvent } from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import type { MouseEvent } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
-import { FloatingPanel } from '@ark-ui/react/floating-panel';
-import { Menu } from '@ark-ui/react/menu';
-import { Portal } from '@ark-ui/react/portal';
-import {
-  ArrowLeft,
-  Check,
-  GripVertical,
-  Maximize2,
-  Minus,
-  Settings2,
-  X,
-} from 'lucide-react';
-import { cx } from 'styled-system/css';
+import { FloatingPanel } from '@ark-ui/react/floating-panel'
+import { Menu } from '@ark-ui/react/menu'
+import { Portal } from '@ark-ui/react/portal'
+import { ArrowLeft, Check, GripVertical, Maximize2, Minus, Settings2, X } from 'lucide-react'
+import { cx } from 'styled-system/css'
 
+import type { MappedIssue } from '../map-violations'
+import { sortBySeverity } from '../map-violations'
 import {
   applySimulations,
   cleanupSimulations,
   DEFAULT_SIMULATION_SETTINGS,
   type SimulationSettings,
-} from '../simulations';
-import type { MappedIssue } from '../map-violations';
-import { sortBySeverity } from '../map-violations';
-import { useVoPlatform } from '../vo-platform';
-import { FixView } from './panel-fix-view';
-import { MainView } from './panel-main-view';
-import type { A11yPanelProps, Stage, PanelView } from './panel-types';
+} from '../simulations'
+import { useVoPlatform } from '../vo-platform'
+import { FixView } from './panel-fix-view'
+import { MainView } from './panel-main-view'
 import {
   activeButtonStyles,
   backButtonStyles,
@@ -58,7 +49,8 @@ import {
   simMenuPositionerStyles,
   simMenuStyles,
   titleStyles,
-} from './panel-styles-shell';
+} from './panel-styles-shell'
+import type { A11yPanelProps, PanelView, Stage } from './panel-types'
 
 export function A11yPanel({
   isOpen,
@@ -68,72 +60,71 @@ export function A11yPanel({
   onToggleHighlight,
   portalContainerRef,
 }: A11yPanelProps) {
-  const { current, prev, next, totalFocusable, currentIndex, issues, isChecking } = focusInfo;
-  const { platform, togglePlatform } = useVoPlatform();
-  const [stage, setStage] = useState<Stage>('default');
-  const [view, setView] = useState<PanelView>('main');
-  const [selectedIssue, setSelectedIssue] = useState<MappedIssue | null>(null);
-  const [simulations, setSimulations] = useState<SimulationSettings>(DEFAULT_SIMULATION_SETTINGS);
-  const [showSnippet, setShowSnippet] = useState(false);
+  const { current, prev, next, totalFocusable, currentIndex, issues, isChecking } = focusInfo
+  const { platform, togglePlatform } = useVoPlatform()
+  const [stage, setStage] = useState<Stage>('default')
+  const [view, setView] = useState<PanelView>('main')
+  const [selectedIssue, setSelectedIssue] = useState<MappedIssue | null>(null)
+  const [simulations, setSimulations] = useState<SimulationSettings>(DEFAULT_SIMULATION_SETTINGS)
+  const [showSnippet, setShowSnippet] = useState(false)
 
   useEffect(() => {
-    applySimulations(simulations);
-    return () => cleanupSimulations();
-  }, [simulations]);
+    applySimulations(simulations)
+    return () => cleanupSimulations()
+  }, [simulations])
 
   const toggleSimulation = useCallback((key: keyof SimulationSettings) => {
-    setSimulations((prevSim) => ({ ...prevSim, [key]: !prevSim[key] }));
-  }, []);
+    setSimulations((prevSim) => ({ ...prevSim, [key]: !prevSim[key] }))
+  }, [])
 
-  const activeSimCount = Object.values(simulations).filter(Boolean).length;
+  const activeSimCount = Object.values(simulations).filter(Boolean).length
 
-  const patternIssues = issues.filter((i) => i.source === 'pattern');
-  const wcagIssues = issues.filter((i) => i.source !== 'pattern');
-  const sortedPatternIssues = sortBySeverity(patternIssues);
-  const sortedWcagIssues = sortBySeverity(wcagIssues);
+  const patternIssues = issues.filter((i) => i.source === 'pattern')
+  const wcagIssues = issues.filter((i) => i.source !== 'pattern')
+  const sortedPatternIssues = sortBySeverity(patternIssues)
+  const sortedWcagIssues = sortBySeverity(wcagIssues)
 
   const openFixView = (issue: MappedIssue) => {
-    setSelectedIssue(issue);
-    setView('fix');
-  };
+    setSelectedIssue(issue)
+    setView('fix')
+  }
 
   const goBack = () => {
-    setView('main');
-    setSelectedIssue(null);
-  };
+    setView('main')
+    setSelectedIssue(null)
+  }
 
   const copyAnnouncement = () => {
     if (current?.announcement) {
-      navigator.clipboard.writeText(current.announcement);
+      navigator.clipboard.writeText(current.announcement)
     }
-  };
+  }
 
   const inspectElement = () => {
     if (current?.element) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const win = window as any;
+      const win = window as any
       if (win.inspect) {
-        win.inspect(current.element);
+        win.inspect(current.element)
       } else {
-        // eslint-disable-next-line no-console
-        console.log('[A11y Panel]', current.element);
+        console.log('[A11y Panel]', current.element)
       }
     }
-  };
+  }
 
   const focusPrevElement = () => {
     if (prev?.element) {
-      prev.element.focus();
+      prev.element.focus()
     }
-  };
+  }
 
   const focusNextElement = () => {
     if (next?.element) {
-      next.element.focus();
+      next.element.focus()
     }
-  };
+  }
 
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
   return (
     <FloatingPanel.Root
@@ -166,7 +157,9 @@ export function A11yPanel({
                     <>
                       <GripVertical size={14} />
                       <span>ACLint</span>
-                      <span className={badgeStyles}>{currentIndex}/{totalFocusable}</span>
+                      <span className={badgeStyles}>
+                        {currentIndex}/{totalFocusable}
+                      </span>
                     </>
                   ) : (
                     <button
@@ -189,10 +182,22 @@ export function A11yPanel({
                   tabIndex={-1}
                   title={`VoiceOver platform: ${platform === 'macos' ? 'macOS' : 'iOS'}`}
                 >
-                  <span className={platform === 'macos' ? platformActiveSegmentStyles : platformInactiveSegmentStyles}>
+                  <span
+                    className={
+                      platform === 'macos'
+                        ? platformActiveSegmentStyles
+                        : platformInactiveSegmentStyles
+                    }
+                  >
                     Mac
                   </span>
-                  <span className={platform === 'ios' ? platformActiveSegmentStyles : platformInactiveSegmentStyles}>
+                  <span
+                    className={
+                      platform === 'ios'
+                        ? platformActiveSegmentStyles
+                        : platformInactiveSegmentStyles
+                    }
+                  >
                     iOS
                   </span>
                 </button>
@@ -334,5 +339,5 @@ export function A11yPanel({
         </FloatingPanel.Positioner>
       </Portal>
     </FloatingPanel.Root>
-  );
+  )
 }

@@ -7,3 +7,4 @@ dist
 apps/web/styled-system
 .pnpm-store
 .cursor
+.turbo
