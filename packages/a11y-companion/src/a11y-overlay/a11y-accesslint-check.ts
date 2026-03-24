@@ -7,6 +7,10 @@
  */
 
 import type { MappedIssue, Severity } from './map-violations';
+import {
+  isAccessLintColorContrastRule,
+  isAutomatedContrastUnreliable,
+} from './unreliable-contrast-context';
 
 type AccessLintViolation = {
   ruleId: string;
@@ -52,7 +56,9 @@ export async function checkElementWithAccessLint(
     cachedPageResult.violations,
   );
 
-  return elementViolations.map(toMappedIssue);
+  const reliable = filterGradientTextContrastFalsePositives(element, elementViolations);
+
+  return reliable.map(toMappedIssue);
 }
 
 /**
@@ -75,6 +81,37 @@ function filterViolationsForElement(
     } catch {
       return false;
     }
+  });
+}
+
+/**
+ * AccessLint compares solid `color` to backgrounds; gradient text uses `background-clip: text`
+ * and often transparent `color`, so reported ratios are frequently wrong. Omit those findings.
+ */
+function filterGradientTextContrastFalsePositives(
+  focused: HTMLElement,
+  violations: AccessLintViolation[],
+): AccessLintViolation[] {
+  return violations.filter((v) => {
+    if (!isAccessLintColorContrastRule(v.ruleId)) return true;
+
+    let matched: NodeListOf<Element>;
+    try {
+      matched = document.querySelectorAll(v.selector);
+    } catch {
+      return true;
+    }
+
+    const inScope = Array.from(matched).filter(
+      (el) =>
+        el === focused ||
+        (el instanceof HTMLElement && focused.contains(el)),
+    ) as HTMLElement[];
+
+    if (inScope.length === 0) return true;
+
+    const allUnreliable = inScope.every((el) => isAutomatedContrastUnreliable(el));
+    return !allUnreliable;
   });
 }
 

@@ -3,9 +3,11 @@
  */
 
 import type { RunOptions } from 'axe-core';
+import type axe from 'axe-core';
 
 import type { AxeViolation, MappedIssue } from './map-violations';
 import { mapViolationsToIssues } from './map-violations';
+import { isAutomatedContrastUnreliable } from './unreliable-contrast-context';
 
 export type AxeCheckResult = {
   violations: AxeViolation[];
@@ -43,7 +45,9 @@ export async function checkElement(
   try {
     const results = await axe.default.run(element, runOptions);
 
-    const violations: AxeViolation[] = results.violations.map((v) => ({
+    const violationsFiltered = filterGradientTextColorContrastViolations(results.violations);
+
+    const violations: AxeViolation[] = violationsFiltered.map((v) => ({
       id: v.id,
       impact: v.impact as AxeViolation['impact'],
       description: v.description,
@@ -77,6 +81,26 @@ export async function checkElement(
       timestamp: Date.now(),
     };
   }
+}
+
+/**
+ * Axe also compares solid `color` to background; gradient text breaks that model.
+ * Drop color-contrast nodes where axe attached the element and it uses gradient text fill.
+ */
+function filterGradientTextColorContrastViolations(
+  violations: axe.Result[],
+): axe.Result[] {
+  return violations
+    .map((v) => {
+      if (v.id !== 'color-contrast') return v;
+      const nodes = v.nodes.filter((n) => {
+        const el = n.element;
+        if (!(el instanceof HTMLElement)) return true;
+        return !isAutomatedContrastUnreliable(el);
+      });
+      return { ...v, nodes };
+    })
+    .filter((v) => v.nodes.length > 0);
 }
 
 /**
