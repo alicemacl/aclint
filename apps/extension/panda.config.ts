@@ -6,7 +6,7 @@ export default defineConfig({
   preflight: true,
   include: [
     './src/**/*.{ts,tsx}',
-    '../../packages/a11y-companion/src/**/*.{ts,tsx}',
+    '../../packages/lens/src/**/*.{ts,tsx}',
   ],
   exclude: ['./node_modules'],
   outdir: 'styled-system',

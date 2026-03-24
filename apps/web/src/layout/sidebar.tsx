@@ -16,7 +16,7 @@ export default function Sidebar() {
     >
       <Link href="/" style={{ textDecoration: 'none', color: 'inherit' }}>
         <Box textStyle="lg" fontWeight="bold" textTransform="uppercase">
-          A11y Lens
+          ACLint
         </Box>
       </Link>
       <Box as="nav">

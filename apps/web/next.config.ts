@@ -2,7 +2,7 @@ import type { NextConfig } from 'next'
 import path from 'node:path'
 
 const nextConfig: NextConfig = {
-  transpilePackages: ['@a11y-lens/a11y-companion'],
+  transpilePackages: ['@aclint/lens'],
   webpack: (config) => {
     config.resolve ??= {}
     config.resolve.alias = {

@@ -3,7 +3,7 @@ import { Box } from '@/src/components/layout'
 import { Dashboard } from '@/src/page-components/dashboard'
 
 export const metadata: Metadata = {
-  title: 'Playground – A11y Lens',
+  title: 'Playground – ACLint',
   description: 'Interactive accessibility playground — test VoiceOver output, pattern detection, and WCAG checks.',
 }
 

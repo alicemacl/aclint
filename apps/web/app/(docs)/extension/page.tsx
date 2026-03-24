@@ -3,8 +3,8 @@ import { Box } from '@/src/components/layout'
 import { ExtensionDocs } from '@/src/page-components/extension-docs/extension-docs'
 
 export const metadata: Metadata = {
-  title: 'Chrome Extension – A11y Lens',
-  description: 'Install the A11y Lens Chrome extension for real-time accessibility feedback on any website.',
+  title: 'Chrome Extension – ACLint',
+  description: 'Install the ACLint Chrome extension for real-time accessibility feedback on any website.',
 }
 
 export default function ExtensionPage() {

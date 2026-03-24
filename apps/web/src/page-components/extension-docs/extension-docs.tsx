@@ -1,7 +1,7 @@
 'use client'
 
 import { Box } from '@/src/components/layout'
-import { useVoPlatform, type VoPlatform } from '@a11y-lens/a11y-companion'
+import { useVoPlatform, type VoPlatform } from '@aclint/lens'
 
 export function ExtensionDocs() {
   const { platform, setPlatform } = useVoPlatform()
@@ -10,7 +10,7 @@ export function ExtensionDocs() {
     <Box paddingX="4" paddingY="2" display="flex" flexDirection="column" gap="6">
       <Box>
         <Box textStyle="xl" fontWeight="bold">
-          A11y Lens – Chrome Extension
+          ACLint – Chrome Extension
         </Box>
         <Box fontSize="sm" color="slate.600" marginTop="1">
           Run real-time accessibility checks on any website — no code changes required.
@@ -19,7 +19,7 @@ export function ExtensionDocs() {
 
       <Section title="What it does">
         <Box as="ul" fontSize="sm" color="slate.700" display="flex" flexDirection="column" gap="1" paddingLeft="4">
-          <Box as="li">Injects the A11y Lens panel onto any page in Chrome</Box>
+          <Box as="li">Injects the ACLint panel onto any page in Chrome</Box>
           <Box as="li">Same VoiceOver preview, pattern detection, and WCAG checks as the npm package</Box>
           <Box as="li">Toggle with the toolbar icon or <Kbd>Ctrl+Shift+A</Kbd></Box>
           <Box as="li">Works on localhost, staging, and production sites</Box>
@@ -34,7 +34,7 @@ export function ExtensionDocs() {
           <Box as="li">Clone the repo and run <Code>pnpm install && pnpm build</Code></Box>
           <Box as="li">Open <Code>chrome://extensions</Code> and enable Developer mode</Box>
           <Box as="li">Click &ldquo;Load unpacked&rdquo; and select the <Code>apps/extension/dist</Code> folder</Box>
-          <Box as="li">Click the A11y Lens icon in the toolbar (or press <Kbd>Ctrl+Shift+A</Kbd>)</Box>
+          <Box as="li">Click the ACLint icon in the toolbar (or press <Kbd>Ctrl+Shift+A</Kbd>)</Box>
         </Box>
       </Section>
 
@@ -120,6 +120,7 @@ function Kbd({ children }: { children: React.ReactNode }) {
       display="inline"
       padding="0 4px"
       backgroundColor="slate.200"
+      color="slate.800"
       borderRadius="sm"
       fontSize="xs"
       fontFamily="monospace"

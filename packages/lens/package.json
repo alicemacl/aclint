@@ -1,5 +1,5 @@
 {
-  "name": "@a11y-lens/a11y-companion",
+  "name": "@aclint/lens",
   "version": "0.0.1",
   "private": true,
   "main": "src/index.ts",

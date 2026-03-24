@@ -1,0 +1,132 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - link "A11y Lens" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e5]: A11y Lens
+      - navigation [ref=e6]:
+        - list [ref=e7]:
+          - listitem [ref=e8]:
+            - link "Playground" [ref=e9] [cursor=pointer]:
+              - /url: /playground
+              - img [ref=e11]
+              - generic [ref=e13]: Playground
+          - listitem [ref=e14]:
+            - link "npm Package" [ref=e15] [cursor=pointer]:
+              - /url: /package
+              - img [ref=e17]
+              - generic [ref=e21]: npm Package
+          - listitem [ref=e22]:
+            - link "Chrome Extension" [ref=e23] [cursor=pointer]:
+              - /url: /extension
+              - img [ref=e25]
+              - generic [ref=e30]: Chrome Extension
+    - main [ref=e31]:
+      - generic [ref=e32]:
+        - generic [ref=e33]:
+          - generic [ref=e34]: Dashboard
+          - generic [ref=e35]: A11y playground — interactive examples for the devtools panel (VoiceOver, patterns, WCAG).
+        - generic [ref=e36]:
+          - generic [ref=e37]:
+            - text: Use
+            - strong [ref=e38]: ⌘⇧A
+            - text: (mac) or
+            - strong [ref=e39]: Ctrl⇧A
+            - text: (Win) to open the a11y panel, then tab through these controls. Mix of Ark UI primitives (accessible) and a small “intentional issues” area for pattern checks.
+          - generic [ref=e40]:
+            - generic [ref=e41]:
+              - heading "Actions menu (Ark Menu)" [level=3] [ref=e42]
+              - generic [ref=e43]: Dropdown with grouped items — test menu / menuitem roles and keyboard.
+            - button "Open actions" [ref=e45] [cursor=pointer]:
+              - text: Open actions
+              - img [ref=e46]
+          - generic [ref=e48]:
+            - generic [ref=e49]:
+              - heading "Selects (Ark Select)" [level=3] [ref=e50]
+              - generic [ref=e51]: Language-style select and a smaller priority field — combobox / listbox behavior.
+            - generic [ref=e52]:
+              - generic [ref=e54]:
+                - generic [ref=e55]: Interface language
+                - combobox "Interface language" [ref=e57] [cursor=pointer]:
+                  - generic [ref=e58]: English
+                  - img [ref=e60]
+                - combobox [ref=e62]
+              - generic [ref=e64]:
+                - generic [ref=e65]: Priority
+                - combobox "Priority" [ref=e67] [cursor=pointer]:
+                  - generic [ref=e68]: Medium
+                  - img [ref=e70]
+          - generic [ref=e72]:
+            - generic [ref=e73]:
+              - heading "Modal dialog (Ark Dialog)" [level=3] [ref=e74]
+              - generic [ref=e75]: Focus moves into the dialog; Escape closes — good for focus-trap / dialog checks.
+            - button "Open sample dialog" [ref=e77] [cursor=pointer]
+          - generic [ref=e78]:
+            - generic [ref=e79]:
+              - heading "Tabs (Ark Tabs)" [level=3] [ref=e80]
+              - generic [ref=e81]: Tab list, selected tab, and panels — compare with VoiceOver “tab group”.
+            - generic [ref=e83]:
+              - tablist [ref=e84]:
+                - tab "Overview" [selected] [ref=e85] [cursor=pointer]
+                - tab "Details" [ref=e86] [cursor=pointer]
+                - tab "History" [ref=e87] [cursor=pointer]
+              - tabpanel "Overview" [ref=e88]: "Overview content: summary metrics and status for this workspace."
+          - generic [ref=e89]:
+            - generic [ref=e90]:
+              - heading "Collapsible (Ark Collapsible)" [level=3] [ref=e91]
+              - generic [ref=e92]: Expandable region with a trigger — disclosure-style behavior.
+            - button "Advanced options" [ref=e95] [cursor=pointer]:
+              - img [ref=e97]
+              - text: Advanced options
+          - generic [ref=e99]:
+            - generic [ref=e100]:
+              - heading "Form controls" [level=3] [ref=e101]
+              - generic [ref=e102]: Checkbox group, radio group, and switch — tick box / radio button / switch in VO.
+            - generic [ref=e103]:
+              - generic [ref=e104]:
+                - generic [ref=e105]: Notifications
+                - group [ref=e106]:
+                  - generic [ref=e107]:
+                    - img [ref=e110]
+                    - generic [ref=e112]: Email
+                    - checkbox "Email" [checked] [ref=e113]
+                  - generic [ref=e114]:
+                    - generic [ref=e116]: Push
+                    - checkbox "Push" [ref=e117]
+                  - generic [ref=e118]:
+                    - generic [ref=e120]: SMS (disabled)
+                    - checkbox "SMS (disabled)" [disabled] [ref=e121]
+              - radiogroup "Shipping speed" [ref=e123]:
+                - generic [ref=e124]: Shipping speed
+                - generic [ref=e125]:
+                  - generic [ref=e129]: Standard (5–7 days)
+                  - radio "Standard (5–7 days)" [checked] [ref=e130]
+                - generic [ref=e131]:
+                  - generic [ref=e135]: Express (2 days)
+                  - radio "Express (2 days)" [ref=e136]
+              - generic [ref=e138]:
+                - generic [ref=e141]: Dark mode preview
+                - checkbox "Dark mode preview" [ref=e142]
+          - generic [ref=e144]:
+            - generic [ref=e145]:
+              - heading "Intentional issues (demo)" [level=3] [ref=e146]
+              - generic [ref=e147]: For testing semantic-pattern detection — do not copy into production UI.
+            - generic [ref=e148]:
+              - generic [ref=e149]:
+                - strong [ref=e150]: "Link as trigger:"
+                - text: the control below uses
+                - code [ref=e151]: <a href="#">
+                - text: like a button — your panel should flag “link as trigger” patterns.
+              - link "Choose language (fake link pattern)" [ref=e152] [cursor=pointer]:
+                - /url: "#"
+              - generic [ref=e153]:
+                - strong [ref=e154]: "Unlabeled input:"
+                - text: text field with no associated label — pattern + WCAG checks.
+              - textbox "Search…" [ref=e155]
+  - button "Open Next.js Dev Tools" [ref=e161] [cursor=pointer]:
+    - img [ref=e162]
+  - alert [ref=e165]
+```

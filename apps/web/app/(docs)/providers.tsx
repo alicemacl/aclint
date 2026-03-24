@@ -1,6 +1,6 @@
 'use client'
 
-import { VoPlatformProvider } from '@a11y-lens/a11y-companion'
+import { VoPlatformProvider } from '@aclint/lens'
 
 export function DocsProviders({ children }: { children: React.ReactNode }) {
   return <VoPlatformProvider>{children}</VoPlatformProvider>
