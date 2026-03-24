@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { A11yDevToolsWrapper } from './A11yDevToolsWrapper'
 import './globals.css'
+import { Navbar } from '@/src/layout/navbar'
 
 export const metadata: Metadata = {
   title: 'ACLint',
@@ -15,6 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <Navbar />
         {children}
         <A11yDevToolsWrapper />
       </body>
