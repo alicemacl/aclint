@@ -15,6 +15,7 @@ export { VO_ROLE_MAP, getVORoleEntry } from './vo-role-map';
 export type { PatternViolation } from './pattern-detector';
 export { detectPatternIssues, patternViolationsToMappedIssues } from './pattern-detector';
 export { ALL_PATTERNS } from './component-patterns';
+export { hasAccessibleName } from './accessible-name-quick';
 
 // Fix guidance (legacy)
 export { FIX_GUIDANCE, getFixGuidance, hasFixGuidance } from './fix-guidance';
