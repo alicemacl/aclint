@@ -1,4 +1,4 @@
-import { BookOpenCheck, Chrome, Package, Play } from 'lucide-react'
+import { BookOpenCheck, Chrome, Package, Play, Shapes } from 'lucide-react'
 
 export type NavItem = {
   href: string
@@ -31,5 +31,11 @@ export const NAV_ITEMS: NavItem[] = [
     label: 'Rules',
     description: 'Browse patterns, WCAG guidance, and built-in accessibility checks.',
     icon: BookOpenCheck,
+  },
+  {
+    href: '/component-patterns',
+    label: 'Component Patterns',
+    description: 'See how ACLint simulates common UI semantics mistakes through pattern tracking.',
+    icon: Shapes,
   },
 ]
